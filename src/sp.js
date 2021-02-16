@@ -21669,21 +21669,47 @@ String.prototype.extract = function (prefix, suffix) {
   return s
 }
 
+let strToCheck
+try {
+  strToCheck = document.querySelector('.sentenceOuter').textContent.trim()
+} catch (e) {
+  strToCheck = window.getSelection().toString()
+}
+// let strToCheck = window.getSelection().toString()
 reverso
-  .getSpellCheck(window.getSelection().toString(), 'French')
+  .getSpellCheck(strToCheck, 'French')
   .then(response => {
-    let result = ''
-    for (const fault of response) {
-      const word = fault.explanation.extract('#!', '#$')
-      result += word + '\n'
+    console.clear()
+    if (response.length === 0) {
+      console.log("Pas d'erreur détectée")
+    } else {
+      for (const fault of response) {
+        const word = fault.explanation.extract('#!', '#$')
+        console.table({
+          error: word,
+          correction: fault.full_corrected,
+          explication: fault.explanation
+        })
+      }
     }
-    return alert(result)
+
+    return
     // return alert(JSON.stringify(response))
   })
   .catch(err => {
-    return alert('error : ' + err + '\n' + JSON.stringify(err))
+    return console.warn(err)
   })
 /*
+let explicationElement = document.querySelector('.ext-explication')
+    if (!explicationElement) {
+      explicationElement = document.createElement('p')
+      explicationElement.className = 'ext-explication'
+      document
+        .querySelector('.sentenceOuter')
+        .parentElement.appendChild(explicationElement)
+    }
+
+    explicationElement.innerHTML = result
 
   ![
     'Connection',
