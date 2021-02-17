@@ -4,11 +4,16 @@
   "description": "",
   "main": "background.js",
   "scripts": {
+    "build": "./node_modules/.bin/browserify src/index.js -o dist/bundle.js",
+    "dev": "./node_modules/.bin/watchify src/index.js -o dist/bundle.js -v",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "reverso-api": "^2.16.1"
+    "browserify": "^17.0.0",
+    "fuzzyset": "^1.0.6",
+    "reverso-api": "^2.16.1",
+    "watchify": "^4.0.0"
   }
 }
