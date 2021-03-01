@@ -2,7 +2,9 @@ const Reverso = require('reverso-api')
 const reverso = new Reverso()
 const FuzzySet = require('fuzzyset')
 
-const USE_EXTERNAL_API = true
+const rawResponseBody = require('./WolLearningContentWebService.js')
+
+const USE_EXTERNAL_API = false
 
 const strToCorrect = "Nous n'aurions pas aimé être a sa place !"
 
@@ -10,18 +12,29 @@ console.clear()
 main()
 
 async function main () {
-  const resp = await fetch(
-    'http://localhost:46127/WolLearningContentWebService.txt'
+  // const resp = await fetch(
+  //   'http://localhost:37811/WolLearningContentWebService.txt'
+  // )
+  // const text = await resp.text()
+  // const data = JSON.parse(hexaConverter(text.slice(4).replaceAll("'", '"')))
+  const data = JSON.parse(
+    hexaConverter(
+      rawResponseBody
+        .slice(4)
+        .replaceAll(",'", ',"')
+        .replaceAll("',", '",')
+    )
   )
-  const text = await resp.text()
-  const data = JSON.parse(hexaConverter(text.slice(4).replaceAll("'", '"')))
 
   const anwserList = await getAnwserFuzzySet(data)
-  const anwser = anwserList.get(strToCorrect)[0][1]
+  const anwser = anwserList.get(getSentenceToCorrect())[0][1]
   const errorPosition = anwser.indexOf('*')
   console.log(anwser)
-
-  console.log(errorPosition, '^')
+  let spacing = ''
+  for (let i = 0; i < errorPosition; i++) {
+    spacing += ' '
+  }
+  console.log(spacing, '^')
   showHTMLAnwser(anwser)
 }
 
