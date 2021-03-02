@@ -4,7 +4,7 @@ const FuzzySet = require('fuzzyset')
 
 const rawResponseBody = require('./WolLearningContentWebService.js')
 
-const USE_EXTERNAL_API = false
+const USE_EXTERNAL_API = true
 
 const strToCorrect = "Nous n'aurions pas aimé être a sa place !"
 
@@ -12,30 +12,29 @@ console.clear()
 main()
 
 async function main () {
-  // const resp = await fetch(
-  //   'http://localhost:37811/WolLearningContentWebService.txt'
-  // )
-  // const text = await resp.text()
-  // const data = JSON.parse(hexaConverter(text.slice(4).replaceAll("'", '"')))
-  const data = JSON.parse(
-    hexaConverter(
-      rawResponseBody
-        .slice(4)
-        .replaceAll(",'", ',"')
-        .replaceAll("',", '",')
+  if (USE_EXTERNAL_API) {
+    checkOnReverso(await getSentenceToCorrect())
+  } else {
+    const data = JSON.parse(
+      hexaConverter(
+        rawResponseBody
+          .slice(4)
+          .replaceAll(",'", ',"')
+          .replaceAll("',", '",')
+      )
     )
-  )
 
-  const anwserList = await getAnwserFuzzySet(data)
-  const anwser = anwserList.get(getSentenceToCorrect())[0][1]
-  const errorPosition = anwser.indexOf('*')
-  console.log(anwser)
-  let spacing = ''
-  for (let i = 0; i < errorPosition; i++) {
-    spacing += ' '
+    const anwserList = await getAnwserFuzzySet(data)
+    const anwser = anwserList.get(getSentenceToCorrect())[0]
+    const errorPosition = anwser.indexOf('*')
+    console.log(Math.floor(anwser[0] * 100), anwser[1])
+    let spacing = ''
+    for (let i = 0; i < errorPosition; i++) {
+      spacing += ' '
+    }
+    console.log(spacing, '^')
+    showHTMLAnwser(anwser)
   }
-  console.log(spacing, '^')
-  showHTMLAnwser(anwser)
 }
 
 async function getAnwserFuzzySet (data) {
@@ -58,10 +57,10 @@ function showHTMLAnwser (anwser) {
     $sentenceOuter.parentElement.appendChild($anwser)
   }
 
-  $anwser.innerHTML = anwser
+  $anwser.innerHTML = Math.floor(anwser[0] * 100) + ' ' + anwser[1]
 }
 
-function CheckOnReverso (strToCheck) {
+function checkOnReverso (strToCheck) {
   reverso
     .getSpellCheck(strToCheck, 'French')
     .then(response => {
